@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>太空新疆域——火箭公司模擬經營小遊戲</title>
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: transparent;/*linear-gradient(to right, #152a32, #192e37, #192e36);*/
+      color: #fff;
+      text-align: center;
+      padding: 2em;
+    }
+    h1 {
+      font-size: 30px;             /* 字體大小 */
+      color: #ffffff;              /* 白色字體比較適合做光暈效果 */
+      font-weight: bold;           /* 粗體 */
+      text-align: center;          /* 置中 */
+      margin-bottom: 30px;         /* 下方留空 */
+      text-shadow: 
+        0 0 5px #00ffff,           /* 淺藍光暈 */
+        0 0 10px #00ffff,
+        0 0 15px #00ffff,
+        0 0 20px #00ffff;
+      /*background-color: #000000;   /* 建議加深背景讓光暈更明顯 */
+      padding: 0px;
+      border-radius: 10px;
+    }
+    h4 {
+      font-size: 1.4em;
+      line-height: 1.6;
+
+      margin-bottom: 1em;
+      color: #00ffcc;
+    }
+    h5 {
+      font-size: 1.2em;
+      line-height: 1.2;
+      margin-top: 0em;
+      margin-bottom: 1em;
+      color: #b5fff0;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: rgba(0,0,0,0.7);
+      border-radius: 15px;
+      padding: 2em;
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+    .hidden { display: none; }
+    button {
+      margin: 1em;
+      padding: 0.75em 2em;
+      font-size: 1.2em;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      background: #1e90ff;
+      color: white;
+      transition: background 0.3s ease;
+    }
+    button:hover { background: #63b3ed; }
+    .choice-btn {
+      display: block;
+      margin: 1em auto;
+      width: 90%;
+    }
+    .score-display {
+      margin-top: 1em;
+      font-size: 2em;
+      color: #00ffcc;
+    }
+    .score-display2 {
+      margin-top: 1em;
+      font-size: 1em;
+      color: #ffffff;
+    }
+    .endscore-display {
+      margin-top: 1em;
+      font-size: 1.8em;
+      color: #00ffcc;
+    }
+    .comment-display{
+      text-align: justify;
+      margin-top: 1em;
+      font-size: 2em;
+      color: #00ffcc;
+    }
+    
+    #ending-text {
+      font-size: 2em;
+      margin: 1em 0;
+      text-align: justify;
+      font-weight: bold;
+      background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet, red);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbow 2s ease infinite;
+    }
+    
+    h6 {
+      font-size: 1.5em;
+      margin: 1em 0;
+      text-align: center;
+      color: #00ffcc;
+    }
+    
+    @keyframes rainbow {
+      0% { background-position: 100% 50%; }
+      50% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    
+    #final-highlight {
+      font-size: 2em;
+      margin: 1em 0;
+      font-weight: bold;
+      text-align: center;
+      background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet, red);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbow 2s ease infinite;
+    }
+
+    
+    .all-endings {
+      margin-top: 1.6em;
+      font-size: 1.2em;
+      color: #eee;
+      text-align: left;
+      padding: 1em;
+      background-color: rgba(255,255,255,0.05);
+      border-radius: 10px;
+    }
+    #end-screen .all-endings h3 {
+      margin-top: 0em;
+      /*font-size: 0.95em; /* 修改"所有評語對照表"標題的字體大小 */
+    }
+
+    #end-screen .all-endings ul li {
+      text-align: justify;
+      /*font-size: 0.5em; /* 修改評語列表的字體大小 */
+    }
+
+    img.logo {
+      max-width: 150px;
+      margin: 0.5em auto;
+      background: white;
+      border-radius: 10px;
+      padding: 0.5em;
+      display: block;
+    }
+    .intro {
+      text-align: left;
+      margin-bottom: 0em;
+      background: rgba(255,255,255,0.05);
+      padding: 0.5em;
+      border-radius: 10px;
+    }
+    .selected-choice {
+      background-color: green !important;
+    }
+    
+    #round-title {
+      font-size: *2em;  /* 你可以依需求調整數值 */
+      font-weight: bold; /* 也可以設為 normal, lighter 等 */
+      margin-bottom: 0.5em;
+      color: #00ffcc;
+    }
+
+    #scenario {
+      font-size: 1.5em;
+      line-height: 1.6;
+      margin-bottom: 1em;
+    }
+    
+    /* === 科學新知頁的網格排版樣式 === */
+    #info-screen {
+      text-align: center;
+      padding: 30px;
+    }
+
+    #info-title {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+
+    #info-text {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+    }
+
+    
+    /* === 火箭公司選擇頁的網格排版樣式 === */
+    .company-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 30px;
+    }
+
+    .company-card {
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 1em;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .company-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 15px rgba(0,255,255,0.4);
+    }
+
+    .logo-wrapper {
+      width: 150px;       /* 固定寬度 */
+      height: 80px;       /* 固定高度，讓圖片對齊 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border-radius: 10px;
+      padding: 0.5em;
+      margin-right: 20px;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .company-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #00ffcc;
+      text-shadow: 0 0 4px #00ffff;
+    }
+
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <div id="start-screen">
+    <h1>🚀 太空新疆域——火箭公司模擬經營小遊戲</h1>
+    <h4>拓展你的太空疆域，畫下專屬未來藍圖！</h4>
+    <div class="intro">
+      <h5>太空任務不只是在銀幕上看，現在可以自己試一試！立體劇場電影《太空新疆域》的故事化為這款互動小遊戲，從建火箭、出任務到開發新基地，一步步靠近宇宙深處。</h5>
+      <h5>開拓屬於自己的宇宙疆域吧！</h5>
+      <h3>🔍 遊戲說明</h3>
+      <p>🌌 <strong>背景故事</strong><br>你是一家新創火箭公司的負責人，正準備踏入太空產業的競爭舞台。從研發火箭、第一次發射火箭，到參與登月與火星任務，你的每個選擇都將影響公司的命運！</p>
+      <p>🧠 <strong>玩法簡介</strong><br>遊戲總共8回合（第7回合包含4個小回合）。每回合會出現一個情境，讓你從三個選項中擇一。不同的火箭公司對每個選擇的成效不同，將影響你的最終得分。</p>
+      <p>🏆 <strong>目標與結局</strong><br>遊戲結束後，將根據你的總分給予不同的評語與稱號。你能成為建立人類首個系外基地的銀河開拓者嗎？</p>
+    </div>
+    <p>註：本遊戲介面設計以手機使用者為主，於電腦瀏覽時部分內容可能無法完整顯示。</p>
+    <p>請選擇你要經營的火箭公司：</p>
+    
+    <div class="company-list">
+      <div class="company-card" onclick="startGame('SpinLaunch')">
+        <div class="logo-wrapper">
+          <img src="https://upload.wikimedia.org/wikipedia/en/7/7b/SpinLaunch.svg" class="logo" alt="SpinLaunch">
+        </div>
+        <div class="company-name">旋轉發射公司</div>
+      </div>
+      <div class="company-card" onclick="startGame('SpaceX')">
+        <div class="logo-wrapper">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/d/de/SpaceX-Logo.svg" class="logo" alt="SpaceX">
+        </div>
+        <div class="company-name">SpaceX</div>
+      </div>
+      <div class="company-card" onclick="startGame('Relativity')">
+        <div class="logo-wrapper">
+          <img src="https://upload.wikimedia.org/wikipedia/zh/3/31/Relativity_Space_Logo.svg" class="logo" alt="Relativity">
+        </div>
+        <div class="company-name">相對論太空公司</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 科學新知頁 -->
+  <div id="info-screen" class="hidden">
+    <h2 id="info-title"></h2>
+    <p id="info-text" style="font-size: 1.2em; line-height: 1.6;text-align: justify;"></p>
+    <div id="info-link" class="hidden" style="margin-top: 1em;"></div>
+    <button onclick="goToNextRoundAfterInfo()">下一頁</button>
+  </div>
+
+
+  <!-- 問題頁 -->
+  <div id="game-screen" class="hidden">
+    <h2 id="round-title"></h2>
+    <p style="text-align: justify;" id="scenario"></p>
+    <div id="choices"></div>
+    <div id="round-comment" class="comment-display hidden"></div>
+    <div id="round-score" class="score-display2 hidden"></div>
+    
+    <button id="next-btn" class="hidden" onclick="nextRound()">下一頁</button>
+  </div>
+  <!-- 結尾頁 -->
+  <div id="final-message-screen" class="hidden">
+    <h6>登月只是起點。<br>從火星到系外行星，<br>人類將穿越無盡星海，<br>在銀河深處築起第一座星際基地。</h6>
+    <h2 id="final-highlight">未來，不再只屬於地球，而屬於整個宇宙！</h2>
+    <button onclick="goToEnding()">下一頁</button>
+  </div>
+
+  <!-- 結算頁 -->
+  <div id="end-screen" class="hidden">
+    <h2>🌟 遊戲結束！</h2>
+    <p id="ending-text"></p>
+    <div class="endscore-display" id="endscore-display"></div>
+    <div class="all-endings">
+      <h3>所有評語對照表：</h3>
+      <ul>
+        <li>0~8 分：雖然遇到許多挑戰，但你仍努力不懈，是未來的星星！</li>
+        <li>9~12 分：你已參與月球任務，是值得信賴的太空科技創業家！</li>
+        <li>13~16 分：太棒了！你帶領公司登上月球，成為月球探險隊長！</li>
+        <li>17~21 分：傳奇誕生！你領導人類登上火星，成為火星領航者！</li>
+        <li>22 分：締造神話！你打破星際疆界，建立人類首個系外基地，榮登「銀河開拓者」的寶座！</li>
+      </ul>
+    </div>
+    <button onclick="restartGame()">重新開始</button>
+  </div>
+</div>
+
+<script>
+const gameData = [
+  {
+    title: "第 1 回合：創業初期",
+    scenario: "你剛成立火箭公司，必須決定第一筆資金的用途。",
+    choices: [
+      { text: "投資在火箭技術研發", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "研發打下基礎，未來發展潛力大。",
+      SpaceX: "堅持技術優先，符合你的公司文化。",
+      Relativity: "研發打下基礎，未來發展潛力大。"
+      } },
+      { text: "大量行銷宣傳以吸引投資", effect: { SpinLaunch: 1, SpaceX: 1, Relativity: 2 }, comments: {
+      SpinLaunch: "行銷帶來關注，但技術基礎仍需加強。",
+      SpaceX: "行銷帶來關注，但技術基礎仍需加強。",
+      Relativity: "新創公司靠曝光吸引資金是關鍵。"
+      } },
+      { text: "購買二手設備快速開始測試", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 1 }, comments: {
+      SpinLaunch: "能快速進入實測階段，符合創新精神。",
+      SpaceX: "靈活使用資源，有助快速原型測試。",
+      Relativity: "成本有效率，但可能不利長期品質管控。"
+      } }
+    ]
+  },
+  {
+    title: "第 2 回合：火箭設計",
+    scenario: "你準備設計公司的第一款火箭...",
+    choices: [
+      { text: "打造可重複使用的火箭", effect: { SpinLaunch: 0, SpaceX: 2, Relativity: 1 }, comments: {
+      SpinLaunch: "這與你公司的技術不太吻合...",
+      SpaceX: "正是你公司的核心技術！",
+      Relativity: "雖然成熟，但較難展現創新。"
+      } },
+      { text: "透過旋轉發射技術，使用不耗燃料的火箭", effect: { SpinLaunch: 2, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "正是你公司的核心技術！",
+      SpaceX: "技術太前衛，不太符合現階段策略...",
+      Relativity: "不是公司主要研發方向，或許未來可以嘗試..."
+      } },
+      { text: "用 3D 列印打造火箭結構", effect: { SpinLaunch: 0, SpaceX: 1, Relativity: 2 }, comments: {
+      SpinLaunch: "創新但不一定與你公司技術結合...",
+      SpaceX: "具有潛力，但仍需時間導入。",
+      Relativity: "正是你主打的製造優勢！"
+      } }
+    ]
+  },
+  {
+    title: "第 3 回合：第一次發射",
+    scenario: "你即將進行首次火箭發射，為了讓火箭能突破地球大氣層，發射時我們需要讓火箭達到下列哪個速度？",
+    choices: [
+      { text: "15倍音速", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "這樣的速度會讓火箭在半空墜毀...",
+      SpaceX: "這樣的速度會讓火箭在半空墜毀...",
+      Relativity: "這樣的速度會讓火箭在半空墜毀..."
+      } },
+      { text: "35倍音速", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "沒錯！達到逃逸速度就能突破地球大氣層！",
+      SpaceX: "沒錯！達到逃逸速度就能突破地球大氣層！",
+      Relativity: "沒錯！達到逃逸速度就能突破地球大氣層！"
+      } },
+      { text: "55倍音速", effect: { SpinLaunch: 1, SpaceX: 1, Relativity: 2 }, comments: {
+      SpinLaunch: "速度雖然夠，但或許不需要這麼快。",
+      SpaceX: "速度雖然夠，但或許不需要這麼快。",
+      Relativity: "速度雖然夠，但或許不需要這麼快。"
+      } }
+    ]
+  },
+  {
+    title: "第 4 回合：突發任務",
+    scenario: "NASA 突然邀請你提前三個月參與一項月球任務，你的火箭建造計畫還來得及嗎？",
+    choices: [
+      { text: "啟用全自動 3D 列印工廠，加班趕工", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "你靈活應變，3D 列印成功讓你在期限內造出火箭！",
+      SpaceX: "你靈活應變，3D 列印成功讓你在期限內造出火箭！",
+      Relativity: "你靈活應變，3D 列印成功讓你在期限內造出火箭！"
+      } },
+      { text: "向 NASA 請求延期，希望多爭取幾個月", effect: { SpinLaunch: 1, SpaceX: 1, Relativity: 1 }, comments: {
+      SpinLaunch: "NASA 勉強同意延期，但其他公司搶先一步。",
+      SpaceX: "NASA 勉強同意延期，但其他公司搶先一步。",
+      Relativity: "NASA 勉強同意延期，但其他公司搶先一步。"
+      } },
+      { text: "決定放棄這次機會，保持原進度", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你錯失一次曝光與合作的絕佳機會...",
+      SpaceX: "你錯失一次曝光與合作的絕佳機會...",
+      Relativity: "你錯失一次曝光與合作的絕佳機會..."
+      } }
+    ]
+  },
+  {
+    title: "第 5 回合：ISS 接班計畫",
+    scenario: "國際太空站 ISS 即將於 2031 除役，取而代之的是NASA與公理太空公司合作的公理太空站計畫。在公理太空公司帶頭之下，NASA 開放民營公司合作建太空站，你怎麼看？",
+    choices: [
+      { text: "這是千載難逢的時機，立刻參與", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "你抓住開放的浪潮，搶下微重力製藥與生技實驗的研究先機！",
+      SpaceX: "你抓住開放的浪潮，搶下微重力製藥與生技實驗的研究先機！",
+      Relativity: "你抓住開放的浪潮，搶下微重力製藥與生技實驗的研究先機！"
+      } },
+      { text: "持觀望態度，等太空站初步完成後再考慮進駐", effect: { SpinLaunch: 1, SpaceX: 1, Relativity: 1 }, comments: {
+      SpinLaunch: "你太謹慎，導致沒有參與初期設計，失去主導權。",
+      SpaceX: "你太謹慎，導致沒有參與初期設計，失去主導權。",
+      Relativity: "你太謹慎，導致沒有參與初期設計，失去主導權。"
+      } },
+      { text: "認為應由政府主導，商業公司不宜涉入太多", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你錯失了新世代太空產業轉型、微重力製藥與生技實驗研究等等先機...",
+      SpaceX: "你錯失了新世代太空產業轉型、微重力製藥與生技實驗研究等等先機...",
+      Relativity: "你錯失了新世代太空產業轉型、微重力製藥與生技實驗研究等等先機..."
+      } }
+    ]
+  },
+  {
+    title: "第 6 回合：太空站的建造與維護模擬",
+    scenario: "在你決定參與 ISS 的接班計畫後，在太空中建造和維護太空站成為一大難題。你會怎麼訓練太空人?",
+    choices: [
+      { text: "搭乘飛機高速旋轉訓練重力變化", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "這類訓練主要用來讓太空人體驗短時間的失重感，時間太短，無法模擬長時間太空艙外的操作細節。",
+      SpaceX: "這類訓練主要用來讓太空人體驗短時間的失重感，時間太短，無法模擬長時間太空艙外的操作細節。",
+      Relativity: "這類訓練主要用來讓太空人體驗短時間的失重感，時間太短，無法模擬長時間太空艙外的操作細節。"
+      } },
+      { text: "在水中模擬太空行動", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "沒錯！中性浮力實驗室能有效模擬太空的失重狀態，是訓練太空艙外施工的關鍵場域。",
+      SpaceX: "沒錯！中性浮力實驗室能有效模擬太空的失重狀態，是訓練太空艙外施工的關鍵場域。",
+      Relativity: "沒錯！中性浮力實驗室能有效模擬太空的失重狀態，是訓練太空艙外施工的關鍵場域。"
+      } },
+      { text: "利用 VR 模擬太空艙內建設流程", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "雖然 VR 能輔助理解流程，但缺乏真實的物理阻力與失重感，不足以全面訓練艙外維修的技能。",
+      SpaceX: "雖然 VR 能輔助理解流程，但缺乏真實的物理阻力與失重感，不足以全面訓練艙外維修的技能。.",
+      Relativity: "雖然 VR 能輔助理解流程，但缺乏真實的物理阻力與失重感，不足以全面訓練艙外維修的技能。"
+      } }
+    ]
+  },
+  {
+    title: "第 7-1 回合：進軍月球任務——阿提米絲一號",
+    scenario: "NASA 開放商業公司參與阿提米絲計畫，你需要了解阿提米絲一至四號任務的主要目標才能參加。阿提米絲一號任務的主要目標是...",
+    choices: [
+      { text: "載人繞行月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你太心急了！這艘還沒有要載人。",
+      SpaceX: "你太心急了！這艘還沒有要載人。",
+      Relativity: "你太心急了！這艘還沒有要載人。"
+      } },
+      { text: "繞行月球", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "你精準掌握阿提米絲計畫的開端——無人任務，奠定後續基礎。",
+      SpaceX: "你精準掌握阿提米絲計畫的開端——無人任務，奠定後續基礎。",
+      Relativity: "你精準掌握阿提米絲計畫的開端——無人任務，奠定後續基礎。"
+      } },
+      { text: "與門戶太空站對接並登月", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你太心急了！門戶太空站尚未建成，也沒有把握登月。",
+      SpaceX: "你太心急了！門戶太空站尚未建成，也沒有把握登月。",
+      Relativity: "你太心急了！門戶太空站尚未建成，也沒有把握登月。"
+      } },
+      { text: "載人登陸月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你太心急了，還沒有十足的把握登月。",
+      SpaceX: "你太心急了，還沒有十足的把握登月。",
+      Relativity: "你太心急了，還沒有十足的把握登月。"
+      } }
+    ]
+  },
+  {
+    title: "第 7-2 回合：進軍月球任務——阿提米絲二號",
+    scenario: "NASA 開放商業公司參與阿提米絲計畫，你需要了解阿提米絲一至四號任務的主要目標才能參加。阿提米絲二號任務的主要目標是...",
+    choices: [
+      { text: "載人繞行月球", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "你知道阿提米絲二號的重要突破，是人類時隔五十年再度接近月球。",
+      SpaceX: "你知道阿提米絲二號的重要突破，是人類時隔五十年再度接近月球。",
+      Relativity: "你知道阿提米絲二號的重要突破，是人類時隔五十年再度接近月球。"
+      } },
+      { text: "繞行月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你太保守了，該載人了！",
+      SpaceX: "你太保守了，該載人了！",
+      Relativity: "你太保守了，該載人了！"
+      } },
+      { text: "與門戶太空站對接並登月", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你太心急了！門戶太空站尚未建成，也沒有把握登月。",
+      SpaceX: "你太心急了！門戶太空站尚未建成，也沒有把握登月。",
+      Relativity: "你太心急了！門戶太空站尚未建成，也沒有把握登月。"
+      } },
+      { text: "載人登陸月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你太心急了，登月要再等等。",
+      SpaceX: "你太心急了，登月要再等等。",
+      Relativity: "你太心急了，登月要再等等。"
+      } }
+    ]
+  },
+  {
+    title: "第 7-3 回合：進軍月球任務——阿提米絲三號",
+    scenario: "NASA 開放商業公司參與阿提米絲計畫，你需要了解阿提米絲一至四號任務的主要目標才能參加。阿提米絲三號任務的主要目標是...",
+    choices: [
+      { text: "載人繞行月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你進度不夠，這次該登月了！",
+      SpaceX: "你進度不夠，這次該登月了！",
+      Relativity: "你進度不夠，這次該登月了！"
+      } },
+      { text: "繞行月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你落後了，早該載人了。",
+      SpaceX: "你落後了，早該載人了。",
+      Relativity: "你落後了，早該載人了。"
+      } },
+      { text: "與門戶太空站對接並登月", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你太心急了！門戶太空站尚未建成。",
+      SpaceX: "你太心急了！門戶太空站尚未建成。",
+      Relativity: "你太心急了！門戶太空站尚未建成。"
+      } },
+      { text: "載人登陸月球", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "你正確指出阿提米絲三號的核心目標——登陸月球重返月面！",
+      SpaceX: "你正確指出阿提米絲三號的核心目標——登陸月球重返月面！",
+      Relativity: "你正確指出阿提米絲三號的核心目標——登陸月球重返月面！"
+      } }
+    ]
+  },
+  {
+    title: "第 7-4 回合：進軍月球任務——阿提米絲四號",
+    scenario: "NASA 開放商業公司參與阿提米絲計畫，你需要了解阿提米絲一至四號任務的主要目標才能參加。阿提米絲四號任務的主要目標是...",
+    choices: [
+      { text: "載人繞行月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你進度不夠，這次應強化深空任務！",
+      SpaceX: "你進度不夠，這次應強化深空任務！",
+      Relativity: "你進度不夠，這次應強化深空任務！"
+      } },
+      { text: "繞行月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你落後太多了，這階段該整合太空站任務了！",
+      SpaceX: "你落後太多了，這階段該整合太空站任務了！",
+      Relativity: "你落後太多了，這階段該整合太空站任務了！"
+      } },
+      { text: "與門戶太空站對接並登月", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "你掌握阿提米絲四號的嶄新里程碑，展現深空任務的整合能力！",
+      SpaceX: "你掌握阿提米絲四號的嶄新里程碑，展現深空任務的整合能力！",
+      Relativity: "你掌握阿提米絲四號的嶄新里程碑，展現深空任務的整合能力！"
+      } },
+      { text: "載人登陸月球", effect: { SpinLaunch: 0, SpaceX: 0, Relativity: 0 }, comments: {
+      SpinLaunch: "你漏掉了太空站的重要整合任務。",
+      SpaceX: "你漏掉了太空站的重要整合任務。",
+      Relativity: "你漏掉了太空站的重要整合任務。"
+      } }
+    ]
+  },
+  {
+    title: "第 8 回合：未來的起點",
+    scenario: "在完成太空站建設、重返月球、累積一系列的經驗之後，NASA 推動這一切的終極目標逐漸清晰：人類將不再只居住在地球，而是前往火星，甚至更遠的星系。",
+    scenario: "未來的你，會怎麼布局？",
+    choices: [
+      { text: "將重心放在地球問題，暫緩太空探索", effect: { SpinLaunch: 1, SpaceX: 1, Relativity: 1 }, comments: {
+      SpinLaunch: "你選擇留在原地，卻錯過了通往太空新疆域的大門。錯過這波突破，人類可能永遠停留在地球。",
+      SpaceX: "你選擇留在原地，卻錯過了通往太空新疆域的大門。錯過這波突破，人類可能永遠停留在地球。",
+      Relativity: "你選擇留在原地，卻錯過了通往太空新疆域的大門。錯過這波突破，人類可能永遠停留在地球。"
+      } },
+      { text: "專注在地月系統，火星太遙不可及", effect: { SpinLaunch: 1, SpaceX: 1, Relativity: 1 }, comments: {
+      SpinLaunch: "你錯過了走向太空新疆域的關鍵時機，保守可能讓人類止步於近地軌道的舒適圈。",
+      SpaceX: "你錯過了走向太空新疆域的關鍵時機，保守可能讓人類止步於近地軌道的舒適圈。",
+      Relativity: "你錯過了走向太空新疆域的關鍵時機，保守可能讓人類止步於近地軌道的舒適圈。"
+      } },
+      { text: "開始布局火星基地，邁出星際移民的第一步", effect: { SpinLaunch: 2, SpaceX: 2, Relativity: 2 }, comments: {
+      SpinLaunch: "你為人類開啟了太空新疆域的未來新篇章。從月球到火星，這一刻，我們真正開始邁向星辰！",
+      SpaceX: "你為人類開啟了太空新疆域的未來新篇章。從月球到火星，這一刻，我們真正開始邁向星辰！",
+      Relativity: "你為人類開啟了太空新疆域的未來新篇章。從月球到火星，這一刻，我們真正開始邁向星辰！"
+      } }
+    ]
+  }
+];
+
+const infoScreenData = [
+  //null,  // 第 1 題後面沒有新知
+  {
+    title: "你知道嗎...",
+    text: {
+      SpinLaunch: `現在太空計畫除了 NASA 主導外，也開放許多民營公司、新創公司參加，旋轉發射公司就是其中之一。
+      
+      該公司於 2014 年由 Jonathan Yaney 創立，致力於開發以離心力為基礎的動能發射系統，目標是提供低成本、環保且高頻率的太空發射解決方案。`,
+      SpaceX: `現在太空計畫除了 NASA 主導外，也開放許多民營公司、新創公司參加，SpaceX 就是其中之一。
+      
+      SpaceX 由Elon Musk 於 2002 年創立，致力於降低太空運輸成本，實現人類在火星上的殖民夢想。`,
+      Relativity: `現在太空計畫除了 NASA 主導外，也開放許多民營公司、新創公司參加，相對論太空公司就是其中之一。
+      
+      該公司於 2015 年由 Tim Ellis 和 Jordan Noone 創立，目標是透過 3D 列印技術和人工智慧，簡化火箭製造流程，實現快速且成本效益高的太空發射。該公司計畫在未來於火星上建立工業基地，支持人類的星際移民。`
+    },
+    link: {
+      SpinLaunch: { text: "SpinLaunch 官網", url: "https://www.spinlaunch.com/" },
+      SpaceX: { text: "SpaceX 官網", url: "https://www.spacex.com/" },
+      Relativity: { text: "Relativity Space 官網", url: "https://www.relativityspace.com/" }
+    }
+  },
+  {
+    title: "你知道嗎...",
+    text: {
+      SpinLaunch: `旋轉發射公司採用創新技術，利用 169 英尺高的次軌道加速器讓火箭透過旋轉來加速，節省昂貴的燃料並避免汙染。
+      
+      為了減少能量不必要的耗損，真空密封離心機將加速器內部抽成真空，排除旋轉過程中引起摩擦的空氣微粒，並用最堅固、最輕的材料之一——碳纖維，來製造旋轉臂和火箭。`,
+      SpaceX: `SpaceX 是首家打造可重複使用火箭的公司。然而，其著陸非常困難。在燃料幾乎耗盡的情況下，降落不能出現任何失誤，否則火箭便會墜毀而無法回收。
+      
+      SpaceX 在 2015 年 12 月成功將獵鷹 9 號火箭的一級助推器垂直著陸並回收，對航太工業具有劃時代的意義。`,
+      Relativity: `相對論太空公司擁有世界最大的金屬 3D 列印機之一 Stargate ，並利用它來生產火箭的部分結構。
+      
+      該公司的第一艘火箭「人族一號」有近 85% 都是透過 3D 列印打造，是世界上首枚主要由 3D 列印製成的火箭。`
+    },
+    link: {
+      SpinLaunch: [
+        { url: "https://www.spinlaunch.com/", text: "SpinLaunch 官網" },
+        { url: "https://sites.google.com/view/tamwebtp/%E4%B8%80%E6%A8%93%E5%B1%95%E7%A4%BA%E5%8D%80_1/%E5%A4%AA%E7%A9%BA%E6%8E%A2%E9%9A%AA/%E7%81%AB%E7%AE%AD", text: "展示場一樓：火箭" }
+      ],
+      SpaceX: [
+        { url: "https://www.spacex.com/", text: "SpaceX 官網" },
+        { url: "https://sites.google.com/view/tamwebtp/%E4%B8%80%E6%A8%93%E5%B1%95%E7%A4%BA%E5%8D%80_1/%E5%A4%AA%E7%A9%BA%E6%8E%A2%E9%9A%AA/%E7%81%AB%E7%AE%AD", text: "展示場一樓：火箭" }
+      ],
+      Relativity: [
+        { url: "https://www.relativityspace.com/", text: "Relativity Space 官網" },
+        { url: "https://sites.google.com/view/tamwebtp/%E4%B8%80%E6%A8%93%E5%B1%95%E7%A4%BA%E5%8D%80_1/%E5%A4%AA%E7%A9%BA%E6%8E%A2%E9%9A%AA/%E7%81%AB%E7%AE%AD", text: "展示場一樓：火箭" }
+      ]
+    }
+  },
+  {
+  	title: "你知道嗎...",
+  	text: `要脫離地球引力，火箭需達到「逃逸速度」，約 11.2 公里/秒，也就是約 33 倍音速，這個速度也被稱作「第二宇宙速度」。
+    
+    而第一宇宙速度是指物體能繞地球作圓周運動所需的最小速度，大約 7.9 公里/秒（約 23 倍音速）。
+    
+    一共有四個宇宙速度。第三宇宙速度則是脫離太陽的引力，飛出太陽系所需的最小速度，大約 16.7 公里/秒（約 49 倍音速）。
+    
+    最後，第四宇宙速度是脫離銀河系的引力，飛出銀河系所需的最小速度，大約 525 公里/秒以上（約 1544 倍音速）。
+    
+    目前人類最快的探測器「旅行者 1 號」僅能達到第三宇宙速度，約 17 公里/秒。`,
+  },
+  {
+  	title: "你知道嗎...",
+    text: `3D 列印技術不只降低了火箭製造的成本和複雜性，更將原本需要數年的建造時間縮短至數週。
+    
+    未來若能在太空或月球、火星上就地列印工具或零件，將大幅減少對地球的依賴，提高太空任務的自給自足能力。`
+  },
+  {
+  	title: "你知道嗎...",
+    text: `公理太空站模組將逐步搭接在 ISS 上，搭接完成後 ISS 將脫離軌道墜毀至大海。
+    
+    由於醫學、製造業、生物組織、細胞、光纖等研究在微重力環境下有新的突破，使得許多公司也想在太空建立屬於自己的太空站。`,
+  	link: [
+    	{ text: "公理太空公司官網", url: "https://www.axiomspace.com/axiom-station"},
+      { text: "NASA", url: "https://www.nasa.gov/humans-in-space/commercial-space/leo-economy/nasa-axiom-space-change-assembly-order-of-commercial-space-station/"},
+      { text: "展示場一樓：太空實驗", url: "https://sites.google.com/view/tamwebtp/%E4%B8%80%E6%A8%93%E5%B1%95%E7%A4%BA%E5%8D%80_1/%E5%A4%AA%E7%A9%BA%E6%8E%A2%E9%9A%AA/%E5%A4%AA%E7%A9%BA%E5%AF%A6%E9%A9%97"}
+    ]
+  },  
+  {
+  	title: "你知道嗎...",
+    text: `NASA 的中性浮力實驗室是個巨大的泳池，訓練太空人模擬失重環境下如何建造和維護太空站。
+    
+    此外，太空碎片、微隕石、太陽輻射、極端溫度等使太空漫步極度危險。
+    
+    突發狀況下，平常訓練時的肌肉記憶所做出的動作就變得至關重要。`,
+    link: [
+      { text: "NASA", url: "https://www.nasa.gov/johnson/neutral-buoyancy-laboratory/"},      
+      { text: "展示場一樓：太空人的生活", url: "https://sites.google.com/view/tamwebtp/%E4%B8%80%E6%A8%93%E5%B1%95%E7%A4%BA%E5%8D%80_1/%E5%A4%AA%E7%A9%BA%E6%8E%A2%E9%9A%AA/%E5%A4%AA%E7%A9%BA%E4%BA%BA%E7%9A%84%E7%94%9F%E6%B4%BB"}
+    ]
+  },
+  {
+  	title: "你知道嗎...",
+    text: `阿提米絲計畫是繼 1972 年的阿波羅 17 號任務以來，首個再次登月並建立月球基地的計畫。該計畫以希臘神話中太陽神阿波羅的孿生姐姐，同時也是月亮女神的阿提米絲命名。
+    
+    阿提米絲 1 號是該計畫的無載人試驗飛行，以測試太空發射系統（ SLS ）火箭、獵戶座太空船。 SLS 火箭載著獵戶座太空船在 2022 年 11 月成功發射。獵戶座太空船內搭載機器人和人體模型，經過約一個月的繞月飛行後，同年 12 月 11 日安全降落在太平洋。`,
+    link: [
+      { text: "NASA", url: "https://www.nasa.gov/reference/artemis-i-2/"},
+      { text: "展示場一樓：登陸月球", url: "https://sites.google.com/view/tamwebtp/%E4%B8%80%E6%A8%93%E5%B1%95%E7%A4%BA%E5%8D%80_1/%E5%A4%AA%E7%A9%BA%E6%8E%A2%E9%9A%AA/%E7%99%BB%E9%99%B8%E6%9C%88%E7%90%83"},
+      { text: "展示場一樓：各國探月計畫", url: "https://sites.google.com/view/tamwebtp/%E4%B8%80%E6%A8%93%E5%B1%95%E7%A4%BA%E5%8D%80_1/%E5%A4%AA%E7%A9%BA%E6%8E%A2%E9%9A%AA/%E5%90%84%E5%9C%8B%E6%8E%A2%E6%9C%88%E8%A8%88%E7%95%AB"},
+      { text: "天文新知：阿提米絲任務將迎來太空團隊的新紀元", url: "https://tam.gov.taipei/News_Content.aspx?n=EF86D8AF23B9A85B&sms=F32C4FF0AC5C2801&s=4206B349FF3C2D45"},
+      { text: "天文新知：獵戶座太空船人體模型從阿提米絲1號任務中返回", url: "https://tam.gov.taipei/News_Content.aspx?n=EF86D8AF23B9A85B&sms=F32C4FF0AC5C2801&s=03231AC93D721CDE"},
+     ]
+  },
+  {
+  	title: "你知道嗎...",
+    text: "阿提米絲 2 號是該計畫的第一次載人飛行測試，預計在 2026 年 4 月執行，共派遣四名太空人。機組人員將駕駛著獵戶座太空船繞月飛行，進一步測試其性能。",
+    link: [
+      { text: "NASA", url: "https://www.nasa.gov/reference/artemis-ii/"}
+    ]
+  },
+  {
+  	title: "你知道嗎...",
+    text: "阿提米絲 3 號是該計畫的第一次載人登月，預計在 2027 年年中執行，共派遣四名太空人，其中兩名降落在月球表面，在月球南極進行太空漫步和各種科學實驗，並在最後搭乘獵戶座太空船返回地球。",
+    link: [
+      { text: "NASA", url: "https://www.nasa.gov/reference/artemis-iii/"}
+    ]
+  },
+  {
+  	title: "你知道嗎...",
+    text: `阿提米絲 4 號是該計畫的第二次載人登月，並與歐洲太空總署（ ESA ）合作進行登月任務，預計在 2028 年 9 月執行，共派遣四名太空人，負責與預計於 2027 年發射的門戶太空站進行對接。
+    
+    門戶太空站是 NASA 、國際太空機構與民營公司共同研議合作的項目。作為一個中繼站和科學站，太空人將在其工作和生活。如同阿提米絲 3 號任務，其中兩名太空人將降落在月球南極。`,
+    link: [
+      { text: "NASA：阿提米絲 4 號", url: "https://www.nasa.gov/missions/artemis/artemis-iv-gateway-gadget-fuels-deep-space-dining/"},
+      { text: "NASA：門戶太空站", url: "https://www.nasa.gov/mission/gateway/"}
+    ]
+  },
+  {
+  	title: "你知道嗎...",
+    text: "阿提米絲計畫的長期目標是在月球上建立一個永久基地，並促進人類前往火星的任務。所以..."
+  }
+];
+
+
+const endings = [
+  { score: 8, text: "雖然遇到許多挑戰，但你仍努力不懈，是未來的星星！" },
+  { score: 12, text: "你已參與月球任務，是值得信賴的太空科技創業家！" },
+  { score: 16, text: "太棒了！你帶領公司登上月球，成為月球探險隊長！" },
+  { score: 21, text: "傳奇誕生！你領導人類登上火星，成為火星領航者！" },
+  { score: 22, text: "締造神話！你打破星際疆界，建立人類首個系外基地，榮登「銀河開拓者」的寶座！" }
+];
+
+let currentRound = 0;
+let company = "";
+let score = 0;
+let currentChoiceScore = 0;
+
+function formatknowledge(knowledge) {
+  return knowledge
+    .replace(/\n/g, "<br>") // 若你 intro 裡是用換行符號斷行，也可以加這行
+    .replace(/\s{2,}/g, ""); // 清除多餘空白
+}
+
+function startGame(selectedCompany) {
+  company = selectedCompany;
+  currentRound = 0;
+  score = 0;
+  document.getElementById("start-screen").classList.add("hidden");
+  document.getElementById("game-screen").classList.remove("hidden");
+  loadRound();
+}
+
+function loadRound() {
+  const round = gameData[currentRound];
+  document.getElementById("round-title").textContent = round.title;
+  document.getElementById("scenario").textContent = round.scenario;
+  const choiceDiv = document.getElementById("choices");
+  choiceDiv.innerHTML = "";
+  document.getElementById("round-comment").classList.add("hidden");
+  document.getElementById("round-score").classList.add("hidden");
+  document.getElementById("next-btn").classList.add("hidden");
+
+  round.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.textContent = choice.text;
+    btn.className = "choice-btn";
+    btn.onclick = () => {
+      currentChoiceScore = choice.effect[company] || 0;
+      score += currentChoiceScore;
+      const comment = choice.comments[company] || "這個選擇帶來了一些變化。";
+      document.getElementById("round-comment").textContent = comment;
+      document.getElementById("round-comment").classList.remove("hidden");
+      document.getElementById("round-score").innerHTML =
+        `本回合得分：<strong>${currentChoiceScore}</strong><br>目前總分：<strong>${score}</strong>`;
+      document.getElementById("round-score").classList.remove("hidden");
+      
+      document.getElementById("next-btn").classList.remove("hidden");
+      choiceDiv.querySelectorAll("button").forEach(b => {
+        b.disabled = true;
+        if (b === btn) b.classList.add("selected-choice");
+      });
+    };
+    choiceDiv.appendChild(btn);
+  });
+}
+
+function nextRound() {
+  const info = infoScreenData[currentRound];
+  if (info) {
+    showInfoScreen(info.title, info.text);
+  } else {
+    currentRound++;
+    if (currentRound >= gameData.length) {
+      showEnding();
+    } else {
+      loadRound();
+    }
+  }
+}
+
+
+function goToNextRoundAfterInfo() {
+  document.getElementById("info-screen").classList.add("hidden");
+  document.getElementById("game-screen").classList.remove("hidden");
+  //currentRound++;
+  if (currentRound === gameData.length - 1/*>= gameData.length*/) {
+    //showEnding();
+    // 顯示結尾特別頁
+    document.getElementById("game-screen").classList.add("hidden");
+    document.getElementById("final-message-screen").classList.remove("hidden");
+  } else {
+  	currentRound++;
+    loadRound();
+  }
+}
+
+function goToEnding() {
+  document.getElementById("final-message-screen").classList.add("hidden");
+  showEnding(); // 跳出你的結算畫面
+}
+
+
+function showInfoScreen(title, text) {
+  // 隱藏題目區與其他頁面
+  document.getElementById("game-screen").classList.add("hidden");
+  document.getElementById("info-screen").classList.remove("hidden");
+
+  // 設定內容
+  document.getElementById("info-title").textContent = title;
+  //document.getElementById("info-text").textContent = text;
+  // 如果 text 是物件，代表是公司對應內容
+  if (typeof text === "object" && text !== null) {
+    document.getElementById("info-text").innerHTML = formatknowledge(text[company]) || "（這家公司暫無對應內容）";
+  } else {
+    document.getElementById("info-text").innerHTML = formatknowledge(text);
+  }
+  
+  const info = infoScreenData[currentRound];
+  const link = info && info.link;
+  const linkArea = document.getElementById("info-link");
+  if (link) {
+    linkArea.innerHTML = "<p>相關內容</p>";
+
+    // 情況 1：多個網址（所有公司共用）
+    if (Array.isArray(link)) {
+      link.forEach(l => {
+        linkArea.innerHTML += `<a href="${l.url}" target="_blank" style="display:block; color:#00ccff;">${l.text}</a>`;
+      });
+    }
+    // 情況 2：公司分別有自己的單一或多個網址
+    else if (typeof link === "object" && link[company]) {
+      const companyLinks = link[company];
+      if (Array.isArray(companyLinks)) {
+        companyLinks.forEach(l => {
+          linkArea.innerHTML += `<a href="${l.url}" target="_blank" style="display:block; color:#00ccff;">${l.text}</a>`;
+        });
+      } else {
+        linkArea.innerHTML += `<a href="${companyLinks.url}" target="_blank" style="display:block; color:#00ccff;">${companyLinks.text}</a>`;
+      }
+    }
+    // 情況 3：單一網址（所有公司共用）
+    else if (link.url && link.text) {
+      linkArea.innerHTML += `<a href="${link.url}" target="_blank" style="display:block; color:#00ccff;">${link.text}</a>`;
+    }
+
+    linkArea.classList.remove("hidden");
+  } else {
+    linkArea.innerHTML = "";
+    linkArea.classList.add("hidden");
+  }
+}
+
+function showEnding() {
+  document.getElementById("game-screen").classList.add("hidden");
+  document.getElementById("end-screen").classList.remove("hidden");
+  let ending = endings.find(e => score <= e.score) || endings[endings.length - 1];
+  document.getElementById("ending-text").textContent = ending.text;
+  document.getElementById("endscore-display").textContent = `你的總分：${score}/22`;
+}
+function restartGame() {
+  // 回復初始變數
+  currentRound = 0;
+  score = 0;
+  company = "";
+  currentChoiceScore = 0;
+
+  // 隱藏所有畫面
+  document.getElementById("end-screen").classList.add("hidden");
+  document.getElementById("final-message-screen").classList.add("hidden");
+  document.getElementById("info-screen").classList.add("hidden");
+  document.getElementById("game-screen").classList.add("hidden");
+
+  // 顯示初始選公司畫面
+  document.getElementById("start-screen").classList.remove("hidden");
+}
+
+</script>
+</body>
+</html>
+
